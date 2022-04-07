@@ -4,7 +4,6 @@ import java.util.Scanner;
 
 public class ChatWorkerThread extends Thread
 {
-    
     private Socket theClientSocket;
     private PrintStream clientOutput;
     private Scanner clientInput;
@@ -16,8 +15,10 @@ public class ChatWorkerThread extends Thread
             System.out.println("Connection Established...");
             this.theClientSocket = theClientSocket;
             this.clientOutput = new PrintStream(this.theClientSocket.getOutputStream());    
-            this.clientInput = new Scanner(this.theClientSocket.getInputStream());
+            //System.out.println("About to add a printstream");
+            CORE.addClientThreadPrintStream(this.clientOutput);
 
+            this.clientInput = new Scanner(this.theClientSocket.getInputStream());
         } 
         catch (Exception e) 
         {
@@ -29,24 +30,23 @@ public class ChatWorkerThread extends Thread
 
     public void run()
     {
+        //this is what the thread does
+        this.clientOutput.println("What is your name?");
+        String name = clientInput.nextLine();
+        CORE.broadcastMessage(name + " has joined!");
+        
+
+        String message;
         while(true)
         {
-            try
+            message = clientInput.nextLine();
+            if(message.equals("/exit"))
             {
-    
-                this.clientOutput.println("What is your name?");
-                String name = clientInput.nextLine();
-                System.out.println("read: " + name);
-                String question;
-                question = clientInput.nextLine();
-                System.out.println(question);
-    
+                clientInput.close();
+                clientOutput.close();
             }
-            catch(Exception e)
-            {
-    
-            }
+            
+            CORE.broadcastMessage(message);
         }
     }
-    
 }
