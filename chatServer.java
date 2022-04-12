@@ -2,7 +2,7 @@ import java.io.PrintStream;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Scanner;
-
+import java.util.Random;
 public class chatServer
 {
     public static void main(String[] args) throws Exception
@@ -17,6 +17,5 @@ public class chatServer
             theThreads.add(t);
             t.start();
         }
-        
     }
 }

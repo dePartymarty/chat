@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
@@ -13,41 +12,34 @@ public class chatClient
         System.out.println(question);
         Scanner localInput = new Scanner(System.in);
         PrintStream clientOutput = new PrintStream(s.getOutputStream());
- 
+        
 
         Thread lt = new Thread() {
             public void run()
-            {                
-                String line = "";
-                
-                while(!line.equals("/exit"))
+            {
+                String line;
+                while(true)
                 {
                     line = clientInput.nextLine();
-                    if (line.equals("/exit"))
-                    {
-                        System.out.println("User leaving");
-                        //clientInput.close();
-                        
-                    }
-                    else
-                    {
-                        System.out.println(line);
-                    }
+                    System.out.println(line);
                 }
-                    
-                    
-    
-            } 
-            
+            }
         };
 
         lt.start();
 
+        String line;
         while(true)
         {
-            clientOutput.println(localInput.nextLine());
+            line = localInput.nextLine();
+            clientOutput.println(line);
+            if(line.equals("/quit"))
+            {
+                break;
+            }
         }
-
+        System.out.println("Goodbye");
+        System.exit(0);
         
     }
 }

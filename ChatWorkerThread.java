@@ -1,6 +1,10 @@
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+
 
 public class ChatWorkerThread extends Thread
 {
@@ -30,23 +34,49 @@ public class ChatWorkerThread extends Thread
 
     public void run()
     {
-        //this is what the thread does
-        this.clientOutput.println("What is your name?");
-        String name = clientInput.nextLine();
-        CORE.broadcastMessage(name + " has joined!");
-        
-
-        String message;
-        while(true)
+        try
         {
-            message = clientInput.nextLine();
-            if(message.equals("/exit"))
-            {
-                clientInput.close();
-                clientOutput.close();
-            }
+            //this is what the thread does
+            this.clientOutput.println("What is your name?");
+            String name = clientInput.nextLine();
+            CORE.broadcastMessage(name + " has joined!");
             
-            CORE.broadcastMessage(message);
+            String message;
+            while(true)
+            {
+                message = clientInput.nextLine();
+                if(message.equals("/quit"))
+                {
+                    CORE.broadcastMessage(name + " has left the server!");
+                    CORE.removeClientThreadPrintStream(this.clientOutput);
+                    break;
+                }
+                else if(message.equals("/upload"))
+                {
+                    this.clientOutput.println("Enter filepath");
+                    String fPath = clientInput.nextLine();
+                    CORE.fileSend(fPath);
+                    this.clientOutput.println("Uploaded");
+                }
+                else if(message.equals("/download"))
+                {
+                    this.clientOutput.println("Enter filepath to download");
+                    String fPath = clientInput.nextLine();
+                    File newFile = new File(fPath);
+                    FileOutputStream userData = new FileOutputStream(newFile);
+                    byte[] file = CORE.fileRecieve();
+                    userData.write(file);
+                    this.clientOutput.println("Downloaded");
+                }
+
+                CORE.broadcastMessage(message);
+            }
         }
+        catch (Exception e)
+        {
+            System.out.println("Not happening chief");
+        }
+
     }
+    
 }
